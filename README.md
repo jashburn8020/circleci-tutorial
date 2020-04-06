@@ -30,6 +30,7 @@
 - Generate requirements file
   - `pip freeze > requirements.txt`
   - see [`requirements.txt`](requirements.txt)
+  - note: on Ubuntu, `pip freeze` includes the `pkg-resources==0.0.0` line, which needs to be removed
 - Commit changes and push to GitHub
 
 ## Set up CircleCI
@@ -44,7 +45,7 @@
   - the build will initially fail
 - To see why it failed
   - click on 'FAILED' status > 'build-and-test'
--
+- Merge both your branch and `circleci-project-setup` branch to the `master` branch
 
 ## Sources
 
