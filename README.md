@@ -17,7 +17,7 @@
 - Install additional modules
   - coverage
 - Write tests
-  - [src/maths.py](src/maths.py)
+  - [test/test_maths.py](test/test_maths.py)
 - Run tests
   - `python -m unittest -v`
   - all the tests should fail
