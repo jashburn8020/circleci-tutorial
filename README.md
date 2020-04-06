@@ -46,6 +46,9 @@
 - To see why it failed
   - click on 'FAILED' status > 'build-and-test'
 - Note: by default, CircleCI will monitor and build all branches in the project
+
+## The `config.yml` file
+
 - Get the `config.yml` file into your feature branch
   - merge the `circleci-project-setup` branch to the `master` branch
   - rebase your feature branch against the `master` branch
@@ -67,11 +70,8 @@
       - environment in which steps of a job will be run
       - possible executors include `docker` (Docker image), `machine` (a dedicated, ephemeral VM) and `macos` (a macOS environment on a VM)
       - `python/default`: the default executor defined in the `python` orb
-        - uses `circleci/python:latest` Docker image, which _should be avoided_
-          - see <https://circleci.com/docs/2.0/executor-types/#docker-image-best-practices>
+        - uses `circleci/python:latest` Docker image, which [_should be avoided_](https://circleci.com/docs/2.0/executor-types/#docker-image-best-practices)
       - pre-built CircleCI Docker images: <https://circleci.com/docs/2.0/circleci-images/>
-      - CircleCI Dockerfiles: <https://github.com/CircleCI-Public/circleci-dockerfiles>
-      - CircleCI Docker images: <https://hub.docker.com/u/circleci>
     - `steps`
       - a collection of executable commands that are run during a job
       - `checkout`
@@ -82,7 +82,7 @@
         - see <https://circleci.com/orbs/registry/orb/circleci/python>
         - `python/load-cache`: load cached pip packages
         - `python/install-deps`: install packages from `requirements.txt` via pip
-          - a virtual environment is not necessary in this step because the `python` orb already makes use of a Docker image
+          - a virtual environment is not necessary on this step because the `python` orb already makes use of a Docker image
           - see:
             - <https://coderbook.com/@marcus/should-i-use-virtualenv-or-docker-containers-with-python/>
             - <https://www.thoughtworks.com/insights/blog/reproducible-work-environments-using-docker>
@@ -96,22 +96,62 @@
     - `main`: unique name for a workflow
       - `jobs`: a list of jobs to run
         - `build-and-test`: a job name that exists in the `config.yml`
-- To view the a pipeline's `config.yml`
-  - on the CircleCI Pipelines page, `...` for one of the pipelines > View Config File
+- To view the a pipeline's `config.yml` in CircleCI
+  - on the CircleCI Pipelines page
+    - `...` (for one of the pipelines) > View Config File
   - click 'Compiled' to see the effective configuration
 
 ### Customise `config.yml`
 
 - `executor: python/default`
-  - add `tag: 3.6.9` (or another specific Python Docker image tag listed on <https://circleci.com/docs/2.0/circleci-images/#python>)
+  - select a specific Python Docker image tag as listed on <https://circleci.com/docs/2.0/circleci-images/#python> (e.g., `3.6.9`)
+  - replace with
 
 ```yml
-executor: python/default
+executor:
+  name: python/default
   tag: 3.6.9
 ```
 
 - `command: ./manage.py test`
   - replace with `command: python -m unittest -v`
+- Commit and push changes to GitHub
+- This should trigger a successful build on CircleCI for this branch
+- `config.yml` at this stage:
+
+```yml
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  build-and-test:
+    executor:
+      name: python/default
+      tag: 3.6.9
+    steps:
+      - checkout
+      - python/load-cache
+      - python/install-deps
+      - python/save-cache
+      - run:
+          command: python -m unittest -v
+          name: Test
+
+workflows:
+  main:
+    jobs:
+      - build-and-test
+```
+
+## Save build artifacts and test metadata
+
+- <https://circleci.com/docs/2.0/artifacts/>
+- <https://circleci.com/docs/2.0/collect-test-data/>
+- <https://pypi.org/project/unittest-xml-reporting/>
+
+## Integrate with Codecov
 
 ## Sources
 
