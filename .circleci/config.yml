@@ -21,8 +21,10 @@ jobs:
       - run:
           command: |
             mkdir artifacts
-            python -m coverage run -m unittest
+            python -m coverage run --source src --branch -m unittest
             python -m coverage report > artifacts/coverage.txt
+            # Upload coverage information to Codecov
+            python -m codecov
           name: coverage.py
       - run:
           command: |

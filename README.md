@@ -21,6 +21,7 @@
 - [CircleCI](https://circleci.com/) account
   - sign up to CircleCI using your GitHub account
 - [Codecov](https://codecov.io/) account
+  - sign up to Codecov using your GitHub account
 
 ## Create small Python application
 
@@ -235,9 +236,18 @@ steps:
 
 ## Integrate with Codecov
 
+- Log in to Codecov
+  - add your GitHub repository
+  - note: you do not need to use a Codecov token with CircleCI if you are using a public GitHub repository
+- Install `codecov` module
+  - `pip install codecov`
+- Regenerate `requirements.txt`
+  - remember to remove `pkg-resources==0.0.0` if you're using Ubuntu
+
 ## Sources
 
 - "Continuous Integration with Python and Circle CI." <https://scotch.io/tutorials/continuous-integration-with-python-and-circle-ci#toc-global-dependencies>.
 - "Configuring CircleCI." <https://circleci.com/docs/2.0/configuration-reference/>.
 - "Collecting Test Metadata." <https://circleci.com/docs/2.0/collect-test-data/>.
 - "Storing Build Artifacts." <https://circleci.com/docs/2.0/artifacts/>.
+- "\[Codecov\] Python Example." <https://github.com/codecov/example-python>.
