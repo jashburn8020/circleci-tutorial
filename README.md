@@ -206,7 +206,7 @@ steps:
   - run:
       command: |
         mkdir artifacts
-        python -m coverage run -m unittest
+        python -m coverage run --source src --branch -m unittest
         python -m coverage report > artifacts/coverage.txt
       name: coverage.py
   - run:
@@ -243,6 +243,26 @@ steps:
   - `pip install codecov`
 - Regenerate `requirements.txt`
   - remember to remove `pkg-resources==0.0.0` if you're using Ubuntu
+- Update the `coverage.py` `run` step in `config.yml` as follows:
+
+```yaml
+command: |
+  mkdir artifacts
+  python -m coverage run --source src --branch -m unittest
+  python -m coverage report > artifacts/coverage.txt
+  # Upload coverage information to Codecov
+  python -m codecov
+name: coverage.py
+```
+
+- Commit your changes and push to GitHub
+- CircleCI will successfully build the latest changes
+  - `coverage.txt` will still be available under 'ARTIFACTS' in the build pipeline
+- View your Codecov dashboard
+  - the 'Overview' tab will state, 'No commits found on master yet'
+  - you will be able to view coverage information under the 'Commits' and 'Branches' tabs
+- Merge you changes to the `master` branch, and push to GitHub
+- View your Codecov dashboard once the build in CircleCI is done
 
 ## Sources
 
