@@ -167,8 +167,8 @@ workflows:
   - install `coverage`
     - `pip install coverage`
   - test run
-    - `coverage run -m unittest`
-    - `coverage report`
+    - `python -m coverage run -m unittest`
+    - `python -m coverage report`
 
 ### Static analysis
 
@@ -176,24 +176,68 @@ workflows:
   - install `pylint`
     - `pip install pylint`
   - generate `pylint` configuration file
-    - `pylint --generate-rcfile > .pylintrc`
+    - `python -m pylint --generate-rcfile > .pylintrc`
   - install `pylint_junit`
-    - to produce analysis report in JUnit XML format
+    - to produce analysis report in JUnit XML format so that `pylint` messages can be viewed in CircleCI's test report
     - `pip install pylint_junit`
   - add `pylint_junit` as a plugin in `.pylintrc`
     - under `[MASTER]`: `load-plugins=pylint_junit`
   - test run
-    - `pylint --output-format=junit src`
+    - `python -m pylint --output-format=junit src`
 
 ### Configure CircleCI
 
 - Regenerate `requirements.txt`
   - remember to remove `pkg-resources==0.0.0` if you're using Ubuntu
+- Discard previous `run` step in `config.yml`, and update `steps` as follows:
+
+```yaml
+steps:
+  - checkout
+  - python/load-cache
+  - python/install-deps
+  - python/save-cache
+  - run:
+      command: |
+        mkdir --parents test-results/unittest
+        python -m xmlrunner --output test-results/unittest
+      name: unittest
+  - run:
+      command: |
+        mkdir artifacts
+        python -m coverage run -m unittest
+        python -m coverage report > artifacts/coverage.txt
+      name: coverage.py
+  - run:
+      command: |
+        mkdir --parents test-results/pylint
+        # --exit-zero: pylint exits with non-zero unless the code is perfect
+        python -m pylint --output-format=junit --exit-zero src > test-results/pylint/pylint.xml
+      name: pylint
+  - store_test_results:
+      path: test-results
+  - store_artifacts:
+      path: test-results
+  - store_artifacts:
+      path: artifacts
+```
+
 - Commit changes and push to GitHub
+- CircleCI will successfully build the latest changes
+  - click on the completed build pipeline > 'build-and-test'
+    - click on 'TESTS' to see `pylint` messages
+    - click on 'ARTIFACTS' to see
+      - `coverage.txt`
+      - `pylint.xml`
+      - `TEST-test.test_maths.MathsTest-xxx.xml`
+- Note: you can choose to not use `pylint_junit`, and use `pylint`'s text output format
+  - you will need up upload (store) the output as artifacts rather than test results
 
 ## Integrate with Codecov
 
 ## Sources
 
 - "Continuous Integration with Python and Circle CI." <https://scotch.io/tutorials/continuous-integration-with-python-and-circle-ci#toc-global-dependencies>.
-- "Configuring CircleCI." <https://circleci.com/docs/2.0/configuration-reference/>
+- "Configuring CircleCI." <https://circleci.com/docs/2.0/configuration-reference/>.
+- "Collecting Test Metadata." <https://circleci.com/docs/2.0/collect-test-data/>.
+- "Storing Build Artifacts." <https://circleci.com/docs/2.0/artifacts/>.
