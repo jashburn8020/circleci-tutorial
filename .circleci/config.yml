@@ -14,8 +14,27 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: python -m unittest -v
-          name: Test
+          command: |
+            mkdir --parents test-results/unittest
+            python -m xmlrunner --output test-results/unittest
+          name: unittest
+      - run:
+          command: |
+            mkdir artifacts
+            coverage run -m unittest
+            coverage report > artifacts/coverage.txt
+          name: coverage.py
+      - run:
+          command: |
+            mkdir --parents test-results/pylint
+            pylint --output-format=junit src > test-results/pylint/pylint.xml
+          name: pylint
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+      - store_artifacts:
+          path: artifacts
 
 workflows:
   main:
