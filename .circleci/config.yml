@@ -27,7 +27,8 @@ jobs:
       - run:
           command: |
             mkdir --parents test-results/pylint
-            python -m pylint --output-format=junit src > test-results/pylint/pylint.xml
+            # --exit-zero: pylint exits with non-zero unless the code is perfect
+            python -m pylint --output-format=junit --exit-zero src > test-results/pylint/pylint.xml
           name: pylint
       - store_test_results:
           path: test-results
