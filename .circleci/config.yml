@@ -21,13 +21,13 @@ jobs:
       - run:
           command: |
             mkdir artifacts
-            coverage run -m unittest
-            coverage report > artifacts/coverage.txt
+            python -m coverage run -m unittest
+            python -m coverage report > artifacts/coverage.txt
           name: coverage.py
       - run:
           command: |
             mkdir --parents test-results/pylint
-            pylint --output-format=junit src > test-results/pylint/pylint.xml
+            python -m pylint --output-format=junit src > test-results/pylint/pylint.xml
           name: pylint
       - store_test_results:
           path: test-results
