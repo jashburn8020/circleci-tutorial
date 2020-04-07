@@ -1,5 +1,18 @@
 # CircleCI Tutorial
 
+- [CircleCI Tutorial](#circleci-tutorial)
+  - [Prerequisites](#prerequisites)
+  - [Create small Python application](#create-small-python-application)
+  - [Set up CircleCI](#set-up-circleci)
+  - [The `config.yml` file](#the-configyml-file)
+    - [Customise `config.yml`](#customise-configyml)
+  - [Generate and save build and test artifacts](#generate-and-save-build-and-test-artifacts)
+    - [Unit testing and code coverage](#unit-testing-and-code-coverage)
+    - [Static analysis](#static-analysis)
+    - [Configure CircleCI](#configure-circleci)
+  - [Integrate with Codecov](#integrate-with-codecov)
+  - [Sources](#sources)
+
 ## Prerequisites
 
 - [GitHub](https://github.com/) account
@@ -15,8 +28,6 @@
 - Create a virtual environment
   - `python3 -m venv venv`
   - `source venv/bin/activate`
-- Install additional modules
-  - coverage
 - Write tests
   - [`test/test_maths.py`](test/test_maths.py)
 - Run tests
@@ -24,12 +35,8 @@
   - all the tests should fail
 - Write implementation until the tests pass
   - [`src/maths.py`](src/maths.py)
-- Run `coverage`
-  - `coverage run -m unittest`
-  - `coverage report`
 - Generate requirements file
   - `pip freeze > requirements.txt`
-  - see [`requirements.txt`](requirements.txt)
   - note: on Ubuntu, `pip freeze` includes the `pkg-resources==0.0.0` line, which needs to be removed
 - Commit changes and push to GitHub
 
@@ -145,11 +152,44 @@ workflows:
       - build-and-test
 ```
 
-## Save build artifacts and test metadata
+## Generate and save build and test artifacts
 
-- <https://circleci.com/docs/2.0/artifacts/>
-- <https://circleci.com/docs/2.0/collect-test-data/>
-- <https://pypi.org/project/unittest-xml-reporting/>
+### Unit testing and code coverage
+
+- Enable JUnit XML reporting for `unittest`
+  - install `unittest-xml-reporting`
+    - `pip install unittest-xml-reporting`
+  - test run
+    - `python -m xmlrunner`
+    - check that a file `TEST-test.test_maths.MathsTest-xxx.xml` containing test results is created
+      - delete the file
+- Enable unit test code coverage tracking using `coverage.py`
+  - install `coverage`
+    - `pip install coverage`
+  - test run
+    - `coverage run -m unittest`
+    - `coverage report`
+
+### Static analysis
+
+- Enable code static analysis using `pylint`
+  - install `pylint`
+    - `pip install pylint`
+  - generate `pylint` configuration file
+    - `pylint --generate-rcfile > .pylintrc`
+  - install `pylint_junit`
+    - to produce analysis report in JUnit XML format
+    - `pip install pylint_junit`
+  - add `pylint_junit` as a plugin in `.pylintrc`
+    - under `[MASTER]`: `load-plugins=pylint_junit`
+  - test run
+    - `pylint --output-format=junit src`
+
+### Configure CircleCI
+
+- Regenerate `requirements.txt`
+  - remember to remove `pkg-resources==0.0.0` if you're using Ubuntu
+- Commit changes and push to GitHub
 
 ## Integrate with Codecov
 
